@@ -2,18 +2,32 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Integración Qlik Sense Cloud</title>
+    <title>Ejemplo de Integración con Qlik-Embed</title>
+    <script src="https://cdn.qlik-dev.com/qlik-embed.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        #qlik-app-container { width: 100%; height: 900px; }
+        .mensaje { margin-top: 20px; font-weight: bold; }
+        .mensaje.exito { color: green; }
+        .mensaje.error { color: red; }
+    </style>
 </head>
 <body>
 
-    <h1>Ejemplo de Integración con Qlik Sense</h1>
+    <h1>Integración de Qlik Sense con Qlik-Embed</h1>
+    <p>Haz clic en el botón para obtener un token y cargar la aplicación de Qlik.</p>
+    
+    <button onclick="embedQlikApp()">Obtener Token y Cargar App</button>
 
-    <iframe id="qlik-iframe" style="width:100%; height:500px; border:1px solid #ccc;"></iframe>
+    <div id="status-message" class="mensaje"></div>
+
+    <div id="qlik-app-container"></div>
 
     <script>
         // Función para obtener el token del servidor backend
         async function fetchImpersonationToken() {
             try {
+                // Esta es la ruta a tu servidor local de Node.js que genera el token
                 const response = await fetch('/api/get-impersonation-token');
                 if (!response.ok) {
                     throw new Error('No se pudo obtener el token del servidor.');
@@ -21,30 +35,62 @@
                 const data = await response.json();
                 return data.access_token;
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al obtener el token:', error);
                 return null;
             }
         }
 
-        // Función para cargar el contenido de Qlik
-        async function loadQlikContent() {
+        // Función principal para incrustar la aplicación de Qlik
+        async function embedQlikApp() {
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = 'Obteniendo token...';
+            statusMessage.className = 'mensaje';
+
             const accessToken = await fetchImpersonationToken();
-            if (accessToken) {
-                const iframe = document.getElementById('qlik-iframe');
-                // URL para incrustar, debe ser una URL de un objeto/hoja en tu tenant de Qlik
-                //const qlikUrl = 'https://tudominio.eu.qlikcloud.com/sense/app/tuiddeapp/sheet/tuiddehoja';
-                const qlikUrl = 'https://keyruspt.eu.qlikcloud.com/sense/app/40de9651-2036-42be-a6e0-86ec38362ad0/state/analysis';
-                // Añade el token como un parámetro de la URL
-                const urlWithToken = `${qlikUrl}?qlik-access-token=${accessToken}`;
-                iframe.src = urlWithToken;
-            } else {
-                alert('No se pudo cargar el contenido de Qlik.');
+
+            if (!accessToken) {
+                statusMessage.textContent = 'Error: No se pudo obtener el token de acceso.';
+                statusMessage.className = 'mensaje error';
+                return;
             }
+
+            statusMessage.textContent = 'Token obtenido. Incrustando aplicación...';
+            statusMessage.className = 'mensaje exito';
+
+            const appContainer = document.getElementById('qlik-app-container');
+            
+            // Configuración para qlik-embed
+            const embedConfig = {
+                host: 'keyruspt.eu.qlikcloud.com',
+                appId: '40de9651-2036-42be-a6e0-86ec38362ad0',
+                sheetId: 'XwLsPUk', // Opcional: ID de una hoja específica
+                embed: appContainer,
+                oauth2: {
+                    accessToken: accessToken,
+                },
+                // El webIntegrationId es necesario para que Qlik-Embed funcione
+                webIntegrationId: 'F5lgGsalXWNob9SEj1n-PuH-l93y9Ojk',
+                // Otros parámetros que puedes necesitar
+                theme: 'horizon',
+                selections: 'current',
+            };
+
+            // Crea una nueva instancia de QlikEmbed
+            const qlikEmbed = new QlikEmbed();
+
+            // Lanza el proceso de incrustación
+            qlikEmbed.embed(embedConfig);
+
+            // Escucha eventos para saber si la incrustación fue exitosa o falló
+            qlikEmbed.on('embedded', () => {
+                statusMessage.textContent = '¡Aplicación incrustada correctamente!';
+            });
+
+            qlikEmbed.on('error', (error) => {
+                statusMessage.textContent = `Error al incrustar: ${error.message}`;
+                statusMessage.className = 'mensaje error';
+            });
         }
-
-        // Cargar el contenido de Qlik al cargar la página
-        window.onload = loadQlikContent;
     </script>
-
 </body>
 </html>
