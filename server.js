@@ -6,9 +6,9 @@ const app = express();
 const port = 3000;
 
 // Configuración sensible (¡Guarda esto en variables de entorno, no en el código real!)
-const QLIK_HOST = 'https://tudominio.eu.qlikcloud.com'; // Sustituye por tu dominio
-const CLIENT_ID = 'tu_client_id_de_impersonacion'; // Sustituye por tu Client ID
-const CLIENT_SECRET = 'tu_client_secret_de_impersonacion'; // Sustituye por tu Client Secret
+const QLIK_HOST = 'https://keyruspt.eu.qlikcloud.com'; // Sustituye por tu dominio
+const CLIENT_ID = 'f6706182174fc70842b6161db71246ba'; // Sustituye por tu Client ID
+const CLIENT_SECRET = '0cb9d1b9c63450eecd4143ffa161f53154ed8eafc07d9658c0e261d7775688a9'; // Sustituye por tu Client Secret
 
 // Sirve el archivo HTML estático
 app.use(express.static(path.join(__dirname, 'public')));
