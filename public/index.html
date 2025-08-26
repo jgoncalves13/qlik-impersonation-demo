@@ -32,8 +32,8 @@
             if (accessToken) {
                 const iframe = document.getElementById('qlik-iframe');
                 // URL para incrustar, debe ser una URL de un objeto/hoja en tu tenant de Qlik
-                const qlikUrl = 'https://tudominio.eu.qlikcloud.com/sense/app/tuiddeapp/sheet/tuiddehoja';
-
+                //const qlikUrl = 'https://tudominio.eu.qlikcloud.com/sense/app/tuiddeapp/sheet/tuiddehoja';
+                const qlikUrl = 'https://keyruspt.eu.qlikcloud.com/sense/app/40de9651-2036-42be-a6e0-86ec38362ad0/state/analysis';
                 // Añade el token como un parámetro de la URL
                 const urlWithToken = `${qlikUrl}?qlik-access-token=${accessToken}`;
                 iframe.src = urlWithToken;
