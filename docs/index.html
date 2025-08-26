@@ -1,1 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Integración Qlik Sense Cloud</title>
+</head>
+<body>
 
+    <h1>Ejemplo de Integración con Qlik Sense</h1>
+
+    <iframe id="qlik-iframe" style="width:100%; height:500px; border:1px solid #ccc;"></iframe>
+
+    <script>
+        // Función para obtener el token del servidor backend
+        async function fetchImpersonationToken() {
+            try {
+                const response = await fetch('/api/get-impersonation-token');
+                if (!response.ok) {
+                    throw new Error('No se pudo obtener el token del servidor.');
+                }
+                const data = await response.json();
+                return data.access_token;
+            } catch (error) {
+                console.error('Error:', error);
+                return null;
+            }
+        }
+
+        // Función para cargar el contenido de Qlik
+        async function loadQlikContent() {
+            const accessToken = await fetchImpersonationToken();
+            if (accessToken) {
+                const iframe = document.getElementById('qlik-iframe');
+                // URL para incrustar, debe ser una URL de un objeto/hoja en tu tenant de Qlik
+                //const qlikUrl = 'https://tudominio.eu.qlikcloud.com/sense/app/tuiddeapp/sheet/tuiddehoja';
+                const qlikUrl = 'https://keyruspt.eu.qlikcloud.com/sense/app/40de9651-2036-42be-a6e0-86ec38362ad0/state/analysis';
+                // Añade el token como un parámetro de la URL
+                const urlWithToken = `${qlikUrl}?qlik-access-token=${accessToken}`;
+                iframe.src = urlWithToken;
+            } else {
+                alert('No se pudo cargar el contenido de Qlik.');
+            }
+        }
+
+        // Cargar el contenido de Qlik al cargar la página
+        window.onload = loadQlikContent;
+    </script>
+
+</body>
+</html>
