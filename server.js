@@ -1,30 +1,32 @@
-// Importar librerías necesarias
+// Importa las librerías necesarias
 const express = require('express');
-const fetch = require('node-fetch'); // Para hacer la solicitud a la API de Qlik
+const fetch = require('node-fetch'); // Usado para hacer la llamada a la API de Qlik
 const path = require('path');
 const app = express();
 const port = 3000;
 
-// Configuración sensible (¡Guarda esto en variables de entorno, no en el código real!)
-const QLIK_HOST = 'https://keyruspt.eu.qlikcloud.com'; // Sustituye por tu dominio
-const CLIENT_ID = 'f6706182174fc70842b6161db71246ba'; // Sustituye por tu Client ID
-const CLIENT_SECRET = '0cb9d1b9c63450eecd4143ffa161f53154ed8eafc07d9658c0e261d7775688a9'; // Sustituye por tu Client Secret
-
-// Sirve el archivo HTML estático
+// Configura el servidor para servir archivos estáticos desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta para generar el token de impersonation
+// Se accede a esta ruta desde el frontend (index.html)
 app.get('/api/get-impersonation-token', async (req, res) => {
-    // El 'userId' del usuario que quieres personificar (puede venir de la sesión de tu usuario)
-    const userId = 'un_usuario_valido@dominio.com';
+    // Estas credenciales deben estar en un archivo .env en producción
+    // En este ejemplo, las leeremos desde las variables de entorno de Vercel
+    const QLIK_HOST = process.env.QLIK_HOST;
+    const CLIENT_ID = process.env.CLIENT_ID;
+    const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-    // Opciones para la solicitud del token
+    // Puedes cambiar el 'userId' según la lógica de tu aplicación
+    const userId = 'cavida.pt/ivida.hugo.santos'; 
+
+    // Opciones para la solicitud del token a la API de Qlik
     const payload = {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         grant_type: 'urn:qlik:oauth:user-impersonation',
         user_lookup: {
-            field: 'subject',
+            field: 'subject', 
             value: userId,
         },
         scope: 'user_default',
@@ -40,7 +42,8 @@ app.get('/api/get-impersonation-token', async (req, res) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Error de la API de Qlik: ${response.statusText}`);
+            const errorText = await response.text();
+            throw new Error(`Error de la API de Qlik: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
@@ -49,6 +52,11 @@ app.get('/api/get-impersonation-token', async (req, res) => {
         console.error('Error al obtener el token:', error);
         res.status(500).send('Error al generar el token de impersonation.');
     }
+});
+
+// Inicia el servidor
+app.listen(port, () => {
+    console.log(`Servidor escuchando en http://localhost:${port}`);
 });
 
 // Iniciar el servidor
