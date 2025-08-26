@@ -8,6 +8,8 @@
 
     <h1>Ejemplo de Integración con Qlik Sense</h1>
 
+    <p>El token de acceso es: <br><strong id="token-display">Cargando token...</strong></p>
+    
     <iframe id="qlik-iframe" style="width:100%; height:500px; border:1px solid #ccc;"></iframe>
 
     <script>
@@ -29,15 +31,20 @@
         // Función para cargar el contenido de Qlik
         async function loadQlikContent() {
             const accessToken = await fetchImpersonationToken();
+            const tokenDisplay = document.getElementById('token-display'); 
+
             if (accessToken) {
+                // Muestra el token en el elemento HTML
+                tokenDisplay.textContent = accessToken;
+
                 const iframe = document.getElementById('qlik-iframe');
                 // URL para incrustar, debe ser una URL de un objeto/hoja en tu tenant de Qlik
-                //const qlikUrl = 'https://tudominio.eu.qlikcloud.com/sense/app/tuiddeapp/sheet/tuiddehoja';
                 const qlikUrl = 'https://keyruspt.eu.qlikcloud.com/sense/app/40de9651-2036-42be-a6e0-86ec38362ad0/state/analysis';
                 // Añade el token como un parámetro de la URL
                 const urlWithToken = `${qlikUrl}?qlik-access-token=${accessToken}`;
                 iframe.src = urlWithToken;
             } else {
+                tokenDisplay.textContent = 'No se pudo obtener el token.'; // Muestra un mensaje de error
                 alert('No se pudo cargar el contenido de Qlik.');
             }
         }
