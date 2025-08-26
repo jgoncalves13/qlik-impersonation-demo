@@ -1,12 +1,17 @@
 {
   "name": "qlik-app-demo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Una aplicación para incrustar Qlik Sense usando OAuth2 y Qlik-Embed.",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0"
+  }
 }
